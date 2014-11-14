@@ -1,0 +1,20 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+CN = *.local.devel
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = *.local.devel
+DNS.2 = local.devel
+DNS.3 = *.local.staging
+DNS.4 = local.staging
+DNS.5 = *.soa-app.devel
+DNS.6 = soa-app.devel
+DNS.7 = *.soa-app.staging
+DNS.8 = soa-app.staging

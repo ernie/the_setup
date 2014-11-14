@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd /app
+exec bundle exec puma -b unix:///tmp/app.sock

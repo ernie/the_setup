@@ -1,0 +1,24 @@
+db:
+  image: postgres
+  ports:
+    - '5432'
+redis:
+  image: redis
+  ports:
+    - '6379'
+app:
+  image: <my-prefix>/<my-app-name>
+  environment:
+    RACK_ENV: production
+    APP_ENV: staging
+    SECRET_KEY_BASE: a_secret_key_base
+    DEVISE_SECRET_TOKEN: a_devise_secret_token
+    DB_USERNAME: postgres
+    DB_PASSWORD:
+    DB_HOSTNAME: db
+    REDIS_HOSTNAME: redis
+  ports:
+    - '4000:80'
+  links:
+    - db
+    - redis

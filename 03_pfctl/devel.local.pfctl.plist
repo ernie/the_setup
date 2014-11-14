@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer/DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>Label</key>
+        <string>devel.local.pfctl.plist</string>
+        <key>ProgramArguments</key>
+        <array>
+                <string>/bin/bash</string>
+                <string>-c</string>
+                <string>ipconfig waitall &amp;&amp; /sbin/pfctl -e -f /etc/pf.conf</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>ServiceDescription</key>
+        <string>FreeBSD Packet Filter (pf) daemon</string>
+  	<key>StandardErrorPath</key>
+        <string>/var/log/pf.log</string>
+        <key>StandardOutPath</key>
+        <string>/var/log/pf.log</string>
+        <key>UserName</key>
+        <string>root</string>
+        <key>WorkingDirectory</key>
+        <string>/var/run</string>
+</dict>
+</plist>

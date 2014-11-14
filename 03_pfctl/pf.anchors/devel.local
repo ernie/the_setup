@@ -1,0 +1,2 @@
+rdr-anchor "forwarding"
+load anchor "forwarding" from "/etc/pf.anchors/devel.local.forwarding"
