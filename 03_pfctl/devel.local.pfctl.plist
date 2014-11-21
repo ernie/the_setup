@@ -8,7 +8,10 @@
         <array>
                 <string>/bin/bash</string>
                 <string>-c</string>
-                <string>ipconfig waitall &amp;&amp; /sbin/pfctl -e -f /etc/pf.conf</string>
+                <string>
+                        sysctl -w net.inet.ip.forwarding=1;
+                        ipconfig waitall &amp;&amp; echo "rdr pass on lo0 inet proto tcp from any to any port 80 -> 127.0.0.1 port 8080\nrdr pass on lo0 inet proto tcp from any to any port 443 -> 127.0.0.1 port 8443" | /sbin/pfctl -a "com.apple/250.TheSetup" -Ef -
+                </string>
         </array>
         <key>RunAtLoad</key>
         <true/>
