@@ -16,14 +16,14 @@ environment, and that's exactly what we want to use it for.
 On OS X, we need to use boot2docker and VirtualBox in order to run a minimal
 distro of Linux, since Docker works via the Linux kernel's containment features.
 Fortunately, we can still do all of this via Homebrew, so we never have to see
-an Oracle software installation window. We also want to use Fig, which can spin
-up an entire fleet of docker containers.
+an Oracle software installation window. We also want to use docker-compose,
+which can spin up an entire fleet of docker containers.
 
     brew install caskroom/cask/brew-cask
     brew cask install virtualbox
     brew install boot2docker
     boot2docker upgrade
-    brew install fig
+    brew install docker-compose
 
 ## The Configuration
 
@@ -31,12 +31,12 @@ There are a few parts to this portion of the setup:
 
 1. Shell
 2. Dockerfile(s)
-3. fig.yml
+3. docker-compose.yml
 
 We'll tackle them in order. Please note that it isn't the intent of this guide
-to be a comprehensive HOWTO on all things Docker and Fig, however. That's what
-the [Docker docs](https://docs.docker.com/) and [Fig site](http://www.fig.sh/)
-are for.
+to be a comprehensive HOWTO on all things Docker and docker-compose, however.
+That's what the [Docker docs](https://docs.docker.com/) and
+[docker-compose docs](https://docs.docker.com/compose/) are for.
 
 ### The Shell
 
@@ -64,13 +64,13 @@ function docker() {
   /usr/bin/env docker $@
 }
 
-function fig() {
+function docker-compose() {
   b2d
-  /usr/bin/env fig $@
+  /usr/bin/env docker-compose $@
 }
 ```
 
-By masking the `docker` and `fig` commands like this, we can ensure
+By masking the `docker` and `docker-compose` commands like this, we can ensure
 the VM is up and running and the shell environment variables we need are
 properly set, even if a future Docker upgrade changes them.
 
@@ -162,30 +162,31 @@ testing:
 Running `docker images | grep <my-prefix>/<my-app-name>` should return the image
 we just built.
 
-### The fig.yml
+### The docker-compose.yml
 
 Now that we have our images in place, we can stand up our staging environment.
-We'll do this using [Fig](http://www.fig.sh/), because Fig is awesome.
+We'll do this using [docker-compose](https://docs.docker.com/compose/).
 
 Assuming you've been following along up until this point, copy
-[fig.yml](fig.yml) from this directory to any location you choose. If you're
-working on a SOA app, maybe this is the directory above all of the compenent
-applications.
+[docker-compose.yml](docker-compose.yml) from this directory to any location you
+choose. If you're working on a SOA app, maybe this is the directory above all
+of the compenent applications.
 
-    cp fig.yml <some-directory-of-my-choosing>/
+    cp docker-compose.yml <some-directory-of-my-choosing>/
 
-The `fig.yml` file is completely standalone, so if you like, you can totally
-skip this step and figure it out later, just editing the `fig.yml` in place for
-now. In any case, `cd` to the directory you chose to work in, open up `fig.yml`
-in your editor of choice, and have a look.
+The `docker-compose.yml` file is completely standalone, so if you like, you can
+totally skip this step and figure it out later, just editing the
+`docker-compose.yml` in place for now. In any case, `cd` to the directory you
+chose to work in, open up `docker-compose.yml` in your editor of choice, and
+have a look.
 
-A `fig.yml` file consists of one or more named services along with the
-information necessary to start their containers. Minimally, this is an image
-name and at least one exposed port to map. Note that port numbers are supplied
-as strings by convention because a bare "xx:yy" format for numbers can lead to
-some confusing interpretation in YAML.
+A `docker-compose.yml` file consists of one or more named services along with
+the information necessary to start their containers. Minimally, this is an
+image name and at least one exposed port to map. Note that port numbers are
+supplied as strings by convention because a bare "xx:yy" format for numbers can
+lead to some confusing interpretation in YAML.
 
-Our `fig.yml` contains three services:
+Our `docker-compose.yml` contains three services:
 
 1. A PostgreSQL database, from the
    [official Docker postgres repo](https://registry.hub.docker.com/_/postgres/).
@@ -217,16 +218,16 @@ service, the "redis" and "db" services will come up, as well.
 
 We'll use that feature next:
 
-    fig run app bundle exec rake db:setup
+    docker-compose run app bundle exec rake db:setup
 
-This will cause Fig to pull down postgres and redis images from the official
-Docker registry, if you haven't already, and launch a new container for both,
-followed by using the previously-tagged image for our app to run the command
-that takes care of setting up our database.
+This will cause docker-compose to pull down postgres and redis images from the
+official Docker registry, if you haven't already, and launch a new container
+for both, followed by using the previously-tagged image for our app to run the
+command that takes care of setting up our database.
 
 Next, we'll bring up the whole stack to serve requests:
 
-    fig up
+    docker-compose up
 
 At this point, we should be able to bring up a web browser and access either
 http://my-app.local.staging or https://my-app.local.staging without issue.
