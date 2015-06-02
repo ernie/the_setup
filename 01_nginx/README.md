@@ -37,7 +37,7 @@ explanation of what we're up to.
 We're also going to copy a couple of supporting files to our nginx configuration
 directory:
 
-    cp -r proxy_ports.conf ssl/ /usr/local/etc/nginx/
+    cp -r proxy_ports.conf ssl /usr/local/etc/nginx/
 
 The `proxy_ports.conf` file has two maps in it for development and staging ports
 by app, starting with port 3001 and 4001, respectively. 3000 and 4000 are set up
