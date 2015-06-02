@@ -23,6 +23,7 @@ which can spin up an entire fleet of docker containers.
     brew cask install virtualbox
     brew install boot2docker
     boot2docker upgrade
+    boot2docker init
     brew install docker-compose
 
 ## The Configuration
