@@ -131,16 +131,12 @@ Here's where things get fun! We can bundle our app, precompile assets, and
 basically create a version of our app that runs as if it's an appliance inside
 our docker container.
 
+    cp Dockerfile <my-rails-app>
     cp -r app-docker <my-rails-app>/docker
     cd <my-rails-app>
-    ln -s docker/Dockerfile
-    echo Dockerfile >> .gitignore
 
 I like to create subdirectory in my apps named "docker" to hold all of the
-Docker-related files (including the Dockerfile itself), symlink the Dockerfile
-to the app root, and add the symlink to my `.gitignore` file. That's due to
-specifics of my particular deployment configuration, though, so feel free to
-adjust accordingly.
+Docker-related files.
 
 Next, we'll open up the Dockerfile and replace `<my-prefix>` with the prefix we
 used earlier. Tweak the Dockerfile as desired. For instance, we might need to

@@ -1,12 +1,15 @@
 [req]
+default_bits = 2048
 distinguished_name = req_distinguished_name
-x509_extensions = v3_req
+req_extensions = v3_req
 prompt = no
+
 [req_distinguished_name]
-CN = *.local.devel
+commonName = *.local.devel
+
 [v3_req]
-keyUsage = keyEncipherment, dataEncipherment
-extendedKeyUsage = serverAuth
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
 subjectAltName = @alt_names
 
 [alt_names]

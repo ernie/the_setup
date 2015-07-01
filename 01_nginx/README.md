@@ -52,7 +52,61 @@ thing that differs between development and production. We're going to set up
 nginx to handle SSL for us so that we don't have to disable features in dev
 mode.
 
-Open `/usr/local/etc/nginx/ssl/local.devel.openssl.cnf` in your text editor of
+First, we'll set ourselves up as a CA:
+
+    cd CA
+    openssl req -new -x509 -extensions v3_ca -keyout private/cakey.pem \
+      -out cacert.pem -days 3650 -config ./openssl.cnf
+    Generating a 2048 bit RSA private key
+    ..........................+++
+    ..............................+++
+    writing new private key to 'private/cakey.pem'
+    Enter PEM pass phrase:<something secure>
+    Verifying - Enter PEM pass phrase:<something secure>
+    -----
+    You are about to be asked to enter information that will be incorporated
+    into your certificate request.
+    What you are about to enter is what is called a Distinguished Name or a DN.
+    There are quite a few fields but you can leave some blank
+    For some fields there will be a default value,
+    If you enter '.', the field will be left blank.
+    -----
+    Organization Name (company) []:MyCompany, Inc.
+    Organizational Unit Name (department, division) []:
+    Email Address []:email@example.com
+    Locality Name (city, district) []:Servers
+    State or Province Name (full name) []:Internet
+    Country Name (2 letter code) []:US
+    Common Name (hostname, IP, or your name) []:Local Development CA
+
+Feel free to substitute your own answers for the above. Especially the
+passphrase. :)
+
+If all goes well, you'll have a cacert.pem file in the current directory, and a
+cakey.pem file in the `private/` subdirectory. Set permissions as restrictively
+as possible on the contents of the `private/` subdirectory.
+
+**This CA directory is now a completely self-contained environment set up to
+sign any certs for you or your team members. Be sure to keep it in a safe
+place. If that safe place is a version control system, be sure to ignore or
+encrypt the `private/` directory!**
+
+Next, we need to tell our machine to consider this new root certificate as
+trusted:
+
+    sudo security add-trusted-cert -d -r trustRoot \
+      -k /Library/Keychains/System.keychain cacert.pem
+
+This adds the certificate as a trusted root certificate in the System keychain.
+That should be sufficient for Chrome and Safari browsers, as well as `curl` and
+other command line apps. For whatever reason, Firefox decided it would rather
+handle this task itself, so if you want it to consider your new CA as valid,
+you'll need to import `cacert.pem` from "Advanced Preferences", here:
+
+![Firefox being Firefox](images/firefox-cacert-import.png)
+
+With that out of the way, open
+`/usr/local/etc/nginx/ssl/local.devel.openssl.cnf` in your text editor of
 choice:
 
     mvim /usr/local/etc/nginx/ssl/local.devel.openssl.cnf
@@ -64,9 +118,9 @@ we don't use just `devel`, it's because of SSL. Browsers don't generally allow
 a wildcard component with just a TLD. They need a domain name, which is why
 we need to use `*.local.devel`.
 
-Because we're enabling v3 x509 extensions (via `x509_extensions = v3_req` in
-this file), we can also set up "subject alternative names", which is just a
-fancy way of saying "this certificate should support multiple domain names".
+Because we're enabling v3 extensions (via `req_extensions = v3_req` in this
+file), we can also set up "subject alternative names", which is just a fancy
+way of saying "this certificate should support multiple domain names".
 
 That being said, you'll want to customize the [alt_names] section to your taste.
 At a minimum, we want to have `*.local.devel`, `local.devel`, `*.local.staging`,
@@ -94,50 +148,41 @@ want to add:
 
 This would allow the certificate to support those domain names without issue.
 
-With our changes made, let's change into the nginx SSL directory...
+With our changes made, let's change into the nginx SSL directory and generate
+a certificate signing request:
 
     cd /usr/local/etc/nginx/ssl
+    openssl req -new -nodes -out local.devel.csr -keyout local.devel.key \
+      -config ./local.devel.openssl.cnf
 
-...generate a private key...
+Next, go back to your "CA-in-a-box" directory. If you didn't move it anywhere,
+that'll be in the `01_nginx/CA` directory of this repo:
 
-    openssl genrsa 2048 > local.devel.key
+    cd <your CA directory>
+    openssl ca -out /usr/local/etc/nginx/ssl/local.devel.pem \
+      -config ./openssl.cnf -infiles /usr/local/etc/nginx/ssl/local.devel.csr
+    Using configuration from ./openssl.cnf
+    Enter pass phrase for ./private/cakey.pem:<something secure from earlier>
+    Check that the request matches the signature
+    Signature ok
+    The Subject's Distinguished Name is as follows
+    commonName            :ASN.1 12:'*.local.devel'
+    Certificate is to be certified until Jun 28 19:45:37 2025 GMT (3650 days)
+    Sign the certificate? [y/n]:y
 
-...create a cert with our custom configuration file...
 
-    openssl req -new -x509 -nodes -sha1 -days 3650 \
-      -key local.devel.key -config local.devel.openssl.cnf > local.devel.cert
+    1 out of 1 certificate requests certified, commit? [y/n]y
+    Write out database with 1 new entries
+    Data Base Updated
 
-...capture the cert's info in a human readable form...
+If you'd like to take a look at the newly-signed certificate, you can run:
 
-    openssl x509 -noout -fingerprint -text < local.devel.cert > local.devel.info
+    openssl x509 -in /usr/local/etc/nginx/ssl/local.devel.pem -noout -text
 
-...and (finally!) create the `.pem` file that nginx needs...
+If all went well, you should see your list of names in the output's
+"X509v3 Subject Alternative Name" section.
 
-    cat local.devel.cert local.devel.key > local.devel.pem
-
-Wow. We should really wrap all of that up in a shell script or something.
-Anyway, moving on, we only have one more thing to do: tell OS X that it should
-trust our certificate for SSL and as a valid certificate authority. Still in
-nginx's `ssl/` directory, type:
-
-    open local.devel.pem
-
-You should see something like the following:
-
-![Trust dialog](images/open-local-devel-pem.png)
-
-Click "Always Trust". You'll be prompted for your password to update your
-keychain. Once supplied, you'll see the newly-trusted certificate in the list,
-with the name "*.local.devel". While the cert has now been trusted as a signer,
-it's not been set up to be trusted for SSL. We'll do that next. Click on the
-newly-trusted certificate. With the certificate open, expand the "Trust" secton,
-and set "Secure Sockets Layer (SSL)" to "Always Trust". When finished, it should
-look like this:
-
-![Such trust. Very SSL. Wow.](images/star-local-devel-trust.png)
-
-Close the window, supply your password one more time, and we're done setting up
-nginx! You can finally run it:
+You can finally run it:
 
     launchctl load ~/Library/LaunchAgents/homebrew.mxcl.nginx.plist
 

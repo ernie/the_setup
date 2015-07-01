@@ -9,7 +9,13 @@ RUN apt-get update -q && apt-get install -qy \
       libyaml-dev \
       libsqlite3-dev \
       nginx \
-      supervisor
+      supervisor \
+      ca-certificates
+
+# If you want to make SSL connections to servers using certificates signed by
+# your private CA, copy your cacert.pem file into config/ and uncomment!
+# COPY config/cacert.pem /usr/local/share/ca-certificates/local.devel.crt
+# RUN /usr/sbin/update-ca-certificates
 
 COPY config/nginx.conf /etc/nginx/nginx.conf
 

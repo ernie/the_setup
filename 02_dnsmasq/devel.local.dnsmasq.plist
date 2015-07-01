@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>devel.local.dnsmasq</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/usr/local/opt/dnsmasq/sbin/dnsmasq</string>
+      <string>-i</string>
+      <string>vboxnet0</string>
+      <string>-I</string>
+      <string>lo0</string>
+      <string>-C</string>
+      <string>/usr/local/etc/dnsmasq-docker.conf</string>
+      <string>--keep-in-foreground</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+  </dict>
+</plist>

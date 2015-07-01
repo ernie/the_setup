@@ -11,9 +11,22 @@ the DNS names we set up for our SSL certificate will work, among other things.
 ## The Install
 
     brew install dnsmasq
-    cp dnsmasq.conf /usr/local/etc/dnsmasq.conf
+    cp dnsmasq.conf /usr/local/etc
     sudo cp -fv /usr/local/opt/dnsmasq/*.plist /Library/LaunchDaemons
+    sudo chown root /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
     sudo launchctl load /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+
+If you want your custom TLDs to be visible to Docker containers, you'll want to
+do the following, as well:
+
+    cp dnsmasq-docker.conf /usr/local/etc
+    sudo cp -fv devel.local.dnsmasq.plist /Library/LaunchDaemons
+    sudo chown root /Library/LaunchDaemons/devel.local.dnsmasq.plist
+    sudo launchctl load /Library/LaunchDaemons/devel.local.dnsmasq.plist
+
+This starts a second instance of dnsmasq listening on the `vboxnet0` interface,
+which returns an alternate IP that works inside docker containers to resolve
+against your machine's configuration.
 
 ## The Configuration
 
