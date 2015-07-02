@@ -57,6 +57,7 @@ function b2d() {
     echo 'Docker VM is not running. Starting...'
     boot2docker up > /dev/null 2>&1
     $(boot2docker shellinit 2> /dev/null)
+    touch /tmp/.b2d
   fi
 }
 
@@ -73,7 +74,9 @@ function docker-compose() {
 
 By masking the `docker` and `docker-compose` commands like this, we can ensure
 the VM is up and running and the shell environment variables we need are
-properly set, even if a future Docker upgrade changes them.
+properly set, even if a future Docker upgrade changes them. Note that we also
+`touch` the /tmp/.b2d file, which will trigger the watch we set up in our
+custom LaunchDaemon, launching our Docker instance of [dnsmasq](../02_dnsmasq/).
 
 ### The Dockerfile(s)
 
@@ -109,6 +112,10 @@ necessary packages to build Ruby, along with nginx and supervisor packages.
 Supervisor is a Python app that's a bit like Foreman, but with some additional
 features we'll find useful in production. It's designed to keep processes
 running using various strategies, not unlike a supervisor in Erlang/OTP.
+
+Be sure to uncomment the lines regarding CA certificates and add your custom
+root certificate to the image, if you want to enable SSL communication between
+your services.
 
 After installing packages, we build Ruby, update RubyGems and install Bundler,
 then create an unprivileged account for use by our app (imaginatively named
@@ -191,6 +198,12 @@ Our `docker-compose.yml` contains three services:
    [official Docker redis repo](https://registry.hub.docker.com/_/redis/).
 3. Our previously-built application image, under the unimaginative service name
    of "app".
+
+We start off each service definition with a `dns` option, pointing at the IP of
+our VirtualBox host-only networking adapter. This is so that the running
+containers will know about our *.devel and *.staging TLDs. If you don't care
+about this, or you didn't set up the extra dnsmasq LaunchDaemon
+[earlier](../02_dnsmasq/), then you should remove these lines.
 
 We'll need to supply the repository name for the app image we built earlier, and
 update the environment variables as necessary. Environment keys with no value

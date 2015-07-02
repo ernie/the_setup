@@ -26,7 +26,8 @@ do the following, as well:
 
 This starts a second instance of dnsmasq listening on the `vboxnet0` interface,
 which returns an alternate IP that works inside docker containers to resolve
-against your machine's configuration.
+against your machine's configuration, once it sees that the file /tmp/.b2d has
+been modified. We'll cover doing this in [the Docker section](../05_docker/).
 
 ## The Configuration
 

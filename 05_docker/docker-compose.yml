@@ -1,12 +1,15 @@
 db:
+  dns: 192.168.59.3
   image: postgres
   ports:
     - '5432'
 redis:
+  dns: 192.168.59.3
   image: redis
   ports:
     - '6379'
 app:
+  dns: 192.168.59.3
   image: <my-prefix>/<my-app-name>
   environment:
     RACK_ENV: production

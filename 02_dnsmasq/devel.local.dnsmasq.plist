@@ -16,8 +16,10 @@
       <string>--keep-in-foreground</string>
     </array>
     <key>RunAtLoad</key>
-    <true/>
-    <key>KeepAlive</key>
-    <true/>
+    <false/>
+    <key>WatchPaths</key>
+    <array>
+      <string>/tmp/.b2d</string>
+    </array>
   </dict>
 </plist>
