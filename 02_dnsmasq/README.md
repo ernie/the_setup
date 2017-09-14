@@ -39,6 +39,10 @@ as easy as:
     echo nameserver 127.0.0.1 | \
       sudo tee /etc/resolver/devel /etc/resolver/staging
 
+Note: In macOS Sierra, the resolver folder doesn't exist so it will need to be created before you can run this.
+    sudo mkdir -v /etc/resolver
+
+
 Now, when OS X tries to look up anything at either of these two TLDs, it'll use
 the local nameserver provided by dnsmasq.
 
