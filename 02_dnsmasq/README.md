@@ -10,24 +10,9 @@ the DNS names we set up for our SSL certificate will work, among other things.
 
 ## The Install
 
-    brew install dnsmasq
+    brew install dnsmasq # You may need `sudo mkdir /usr/local/sbin` and chown
     cp dnsmasq.conf /usr/local/etc
-    sudo cp -fv /usr/local/opt/dnsmasq/*.plist /Library/LaunchDaemons
-    sudo chown root /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
-    sudo launchctl load /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
-
-If you want your custom TLDs to be visible to Docker containers, you'll want to
-do the following, as well:
-
-    cp dnsmasq-docker.conf /usr/local/etc
-    sudo cp -fv devel.local.dnsmasq.plist /Library/LaunchDaemons
-    sudo chown root /Library/LaunchDaemons/devel.local.dnsmasq.plist
-    sudo launchctl load /Library/LaunchDaemons/devel.local.dnsmasq.plist
-
-This starts a second instance of dnsmasq listening on the `vboxnet0` interface,
-which returns an alternate IP that works inside docker containers to resolve
-against your machine's configuration, once it sees that the file /tmp/.b2d has
-been modified. We'll cover doing this in [the Docker section](../05_docker/).
+    sudo brew services start dnsmasq
 
 ## The Configuration
 
@@ -36,12 +21,9 @@ handled by the `dnsmasq.conf` we placed in `/usr/local/etc`. However, we do need
 to tell OS X to use our dnsmasq server to resolve the TLDs we configured. That's
 as easy as:
 
+    sudo mkdir -p /etc/resolver
     echo nameserver 127.0.0.1 | \
       sudo tee /etc/resolver/devel /etc/resolver/staging
-
-Note: In macOS Sierra, the resolver folder doesn't exist so it will need to be created before you can run this.
-    sudo mkdir -v /etc/resolver
-
 
 Now, when OS X tries to look up anything at either of these two TLDs, it'll use
 the local nameserver provided by dnsmasq.
