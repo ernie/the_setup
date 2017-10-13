@@ -185,6 +185,10 @@ You can finally start the service:
 
     brew services start nginx
 
+If you get the error `No such file or directory` when trying to run the launch agent, try:
+
+    brew services start nginx
+
 A `ps aux | grep nginx` should show a recently-started nginx master and worker
 process. If it isn't recent, you may need to unload and then load the plist
 again. If it doesn't show anything at all, take a look at
