@@ -17,7 +17,7 @@ I wrote this in order to share a setup I've been using locally for over a year,
 and refining recently, with my coworkers at [nVisium](https://nvisium.com).
 I've seen bits and pieces of similar setups around the web, mostly in the form
 of a quick mention in a blog post or a tweet, but I've not seen a comprehensive
-guide to getting up and running on a current version of OS X before.
+guide to getting up and running on a current version of macOS before.
 
 After seeing this writeup, nVisium was quick to encourage me to share it more
 broadly. nVisium is cool like that. We're also really awesome at helping people
@@ -39,9 +39,9 @@ to run a suite of acceptance tests against a full application stack running in
 an isolated local staging environment under Docker, if you want. And why
 *wouldn't* you want? That sounds awesome!
 
-The base system assumed by this guide is Mac OS X 10.10 Yosemite, with a working
+The base system assumed by this guide is macOS 10.13 High Sierra, with a working
 install of [Homebrew](http://brew.sh). While it should work for less current
-versions of OS X, changes in launchd may require a few tweaks to plist files.
+versions of macOS, changes in launchd may require a few tweaks to plist files.
 
 ## The Outline
 

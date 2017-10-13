@@ -7,8 +7,9 @@ up, but we still have a problem. We run nginx as a regular user, which means it
 binds to unprivileged ports. We want to be able to go to URLs like
 http://my-app.local.devel and https://my-app.local.devel without appending a
 port number to the URL, and without changing nginx from its default Homebrew
-unprivileged port setup. Thankfully, OS X has a packet filter that can take care
-of this for us. The `pfctl` command is the one that manages this packet filter.
+unprivileged port setup. Thankfully, macOS has a packet filter that can take
+care of this for us. The `pfctl` command is the one that manages this packet
+filter.
 
 ## The Installation
 

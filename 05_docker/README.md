@@ -13,70 +13,19 @@ environment, and that's exactly what we want to use it for.
 
 ## The Installation
 
-On OS X, we need to use boot2docker and VirtualBox in order to run a minimal
-distro of Linux, since Docker works via the Linux kernel's containment features.
-Fortunately, we can still do all of this via Homebrew, so we never have to see
-an Oracle software installation window. We also want to use docker-compose,
-which can spin up an entire fleet of docker containers.
-
-    brew install caskroom/cask/brew-cask
-    brew cask install virtualbox
-    brew install boot2docker
-    boot2docker upgrade
-    boot2docker init
-    brew install docker-compose
+    brew cask install docker
 
 ## The Configuration
 
-There are a few parts to this portion of the setup:
+There are two parts to this portion of the setup:
 
-1. Shell
-2. Dockerfile(s)
-3. docker-compose.yml
+1. Dockerfile(s)
+2. docker-compose.yml
 
 We'll tackle them in order. Please note that it isn't the intent of this guide
 to be a comprehensive HOWTO on all things Docker and docker-compose, however.
 That's what the [Docker docs](https://docs.docker.com/) and
 [docker-compose docs](https://docs.docker.com/compose/) are for.
-
-### The Shell
-
-Running `boot2docker up` will start the Docker VM and spit out some instructions
-about how to configure your environment so that the `docker` command works as
-expected. That's helpful, but not terribly convenient. We could define the
-environment variables statically in our `.bashrc`, `.zshrc`, or whatever, but I
-find that I don't want the Docker VM running all the time, anyway. Consequently,
-I opted to define a few simple functions in my `.zshrc` (this should work just
-fine for Bash users as well):
-
-```sh
-function b2d() {
-  if [ $(boot2docker status) = 'running' ]; then
-    $(boot2docker shellinit 2> /dev/null)
-  else
-    echo 'Docker VM is not running. Starting...'
-    boot2docker up > /dev/null 2>&1
-    $(boot2docker shellinit 2> /dev/null)
-    touch /tmp/.b2d
-  fi
-}
-
-function docker() {
-  b2d
-  /usr/bin/env docker $@
-}
-
-function docker-compose() {
-  b2d
-  /usr/bin/env docker-compose $@
-}
-```
-
-By masking the `docker` and `docker-compose` commands like this, we can ensure
-the VM is up and running and the shell environment variables we need are
-properly set, even if a future Docker upgrade changes them. Note that we also
-`touch` the /tmp/.b2d file, which will trigger the watch we set up in our
-custom LaunchDaemon, launching our Docker instance of [dnsmasq](../02_dnsmasq/).
 
 ### The Dockerfile(s)
 
