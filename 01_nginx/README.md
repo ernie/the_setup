@@ -16,9 +16,8 @@ directory hierarchy, and not scattered all over our filesystem.
 
     brew install nginx
 
-You were expecting something else? Go ahead and symlink the `.plist` file as
-instructed, but don't bother loading it yet, because we're going to make some
-changes to its configuration first.
+You were expecting something else? Don't bother running `brew services ...` yet.
+We have some changes to make.
 
 ## The Configuration
 
@@ -182,9 +181,9 @@ If you'd like to take a look at the newly-signed certificate, you can run:
 If all went well, you should see your list of names in the output's
 "X509v3 Subject Alternative Name" section.
 
-You can finally run it:
+You can finally start the service:
 
-    launchctl load ~/Library/LaunchAgents/homebrew.mxcl.nginx.plist
+    brew services start nginx
 
 A `ps aux | grep nginx` should show a recently-started nginx master and worker
 process. If it isn't recent, you may need to unload and then load the plist
